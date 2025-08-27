@@ -1,5 +1,6 @@
 package backend;
 
+import frontend.ModeConstants;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
@@ -7,7 +8,7 @@ import java.util.List;
 
 public class UserDao {
 
-    public void saveUser(User user) {
+    public int saveUser(User user) {
         org.hibernate.Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.getTransaction();
@@ -17,8 +18,10 @@ public class UserDao {
         } catch (Exception e) {
             if (transaction != null && (transaction.isActive() || transaction.getRollbackOnly())) {
                 transaction.rollback();
+                return ModeConstants.ERROR;
             }
         }
+        return ModeConstants.OK;
     }
 
     public User getUserById(String uuid) {
@@ -34,7 +37,7 @@ public class UserDao {
         }
     }
 
-    public void updateUser(User user) {
+    public int updateUser(User user) {
         org.hibernate.Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.getTransaction();
@@ -44,11 +47,13 @@ public class UserDao {
         } catch (Exception e) {
             if (transaction != null && (transaction.isActive() || transaction.getRollbackOnly())) {
                 transaction.rollback();
+                return ModeConstants.ERROR;
             }
         }
+        return ModeConstants.OK;
     }
 
-    public void deleteUser(User user) {
+    public int deleteUser(User user) {
         org.hibernate.Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.getTransaction();
@@ -58,7 +63,9 @@ public class UserDao {
         } catch (Exception e) {
             if (transaction != null && (transaction.isActive() || transaction.getRollbackOnly())) {
                 transaction.rollback();
+                return ModeConstants.ERROR;
             }
         }
+        return ModeConstants.OK;
     }
 }
