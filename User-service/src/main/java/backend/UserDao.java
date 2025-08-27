@@ -1,29 +1,23 @@
 package backend;
 
-import jakarta.transaction.*;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 public class UserDao {
 
-    private static final Logger logger = Logger.getLogger(UserDao.class.getName());
-
-    public void saveUser(User user) throws SystemException {
+    public void saveUser(User user) {
         org.hibernate.Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
+            transaction = session.getTransaction();
+            transaction.begin();
             session.persist(user);
             transaction.commit();
-            logger.info("User\n" + user + "\nis added");
         } catch (Exception e) {
-            if (transaction != null) {
-                logger.info("User\n" + user + "\nis not added");
+            if (transaction != null && (transaction.isActive() || transaction.getRollbackOnly())) {
                 transaction.rollback();
             }
-            e.printStackTrace();
         }
     }
 
@@ -40,31 +34,31 @@ public class UserDao {
         }
     }
 
-    public void updateUser(User user) throws SystemException {
-        Transaction transaction = null;
+    public void updateUser(User user) {
+        org.hibernate.Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = (Transaction) session.beginTransaction();
+            transaction = session.getTransaction();
+            transaction.begin();
             session.merge(user);
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) {
+            if (transaction != null && (transaction.isActive() || transaction.getRollbackOnly())) {
                 transaction.rollback();
             }
-            e.printStackTrace();
         }
     }
 
-    public void deleteUser(User user) throws SystemException {
-        Transaction transaction = null;
+    public void deleteUser(User user) {
+        org.hibernate.Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = (Transaction) session.beginTransaction();
+            transaction = session.getTransaction();
+            transaction.begin();
             session.remove(user);
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) {
+            if (transaction != null && (transaction.isActive() || transaction.getRollbackOnly())) {
                 transaction.rollback();
             }
-            e.printStackTrace();
         }
     }
 }
