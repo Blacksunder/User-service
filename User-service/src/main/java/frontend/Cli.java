@@ -176,9 +176,15 @@ public class Cli {
             return null;
         }
         User user = new User(name, email, age);
-        if (!newUser) {
-            user.setUuid(uuid);
+        if (newUser) {
+            return user;
         }
+        User oldUser = userDao.getUserById(uuid);
+        if (oldUser == null) {
+            return null;
+        }
+        user.setUuid(uuid);
+        user.setCreatedAt(oldUser.getCreatedAt());
         return user;
     }
 
