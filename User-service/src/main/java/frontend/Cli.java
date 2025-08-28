@@ -1,6 +1,7 @@
 package frontend;
 
 import backend.HibernateUtil;
+import backend.ModeConstants;
 import backend.User;
 import backend.UserDao;
 
@@ -12,7 +13,7 @@ public class Cli {
     private final UserDao userDao = new UserDao();
     private final Scanner scanner = new Scanner(System.in);
     
-    public void appCycle() {
+    public void launch() {
         int code = ModeConstants.OK;
         while (code != ModeConstants.EXIT) {
             code = startScreen();
@@ -72,7 +73,7 @@ public class Cli {
 
     private int getAllScreen() {
         System.out.println(TextConstants.APP_NAME);
-        System.out.println("All users' id");
+        System.out.println("All users' id:");
         userDao.getAllUsers().forEach(x -> System.out.println(x.getUuid()));
         System.out.println(TextConstants.CHOOSE_OPTION);
         System.out.println(TextConstants.EXIT);
@@ -81,12 +82,12 @@ public class Cli {
 
     private String getUserInput() {
         System.out.println(TextConstants.APP_NAME);
-        System.out.println("Enter user's uuid");
+        System.out.println("Enter user's uuid:");
         return scanner.nextLine();
     }
 
     private int getUserScreen(String uuid) {
-        System.out.println(uuid + " user info");
+        System.out.println(uuid + " user info:");
         System.out.println(userDao.getUserById(uuid));
         System.out.println(TextConstants.CHOOSE_OPTION);
         System.out.println(TextConstants.EXIT);
@@ -138,7 +139,7 @@ public class Cli {
 
     private int deleteUserInput() {
         System.out.println(TextConstants.APP_NAME);
-        System.out.println("Enter user's uuid");
+        System.out.println("Enter user's uuid:");
         String uuid = scanner.nextLine();
         User toDelete = userDao.getUserById(uuid);
         if (toDelete == null) {
@@ -158,7 +159,7 @@ public class Cli {
         return getIntInput();
     }
 
-    private User parseInput(String input, boolean newUser) {
+    private User parseInput(String input, boolean isNewUser) {
         if (input == null) {
             return null;
         }
@@ -176,7 +177,7 @@ public class Cli {
             return null;
         }
         User user = new User(name, email, age);
-        if (newUser) {
+        if (isNewUser) {
             return user;
         }
         User oldUser = userDao.getUserById(uuid);

@@ -1,4 +1,4 @@
-package frontend;
+package backend;
 
 public class ModeConstants {
     public static final int GET_ALL = 1;
