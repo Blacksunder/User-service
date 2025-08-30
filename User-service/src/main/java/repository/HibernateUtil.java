@@ -1,4 +1,4 @@
-package backend;
+package repository;
 
 import lombok.Getter;
 import org.hibernate.SessionFactory;

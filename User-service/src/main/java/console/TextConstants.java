@@ -1,4 +1,4 @@
-package frontend;
+package console;
 
 import java.util.List;
 

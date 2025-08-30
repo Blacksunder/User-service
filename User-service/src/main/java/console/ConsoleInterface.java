@@ -1,28 +1,35 @@
-package frontend;
+package console;
 
-import backend.HibernateUtil;
-import backend.ModeConstants;
-import backend.User;
-import backend.UserDao;
+import dto.UserDto;
+import enums.InputMode;
+import enums.ResponseCode;
+import mapper.UserMapper;
+import repository.HibernateUtil;
+import entity.UserEntity;
+import repository.UserDao;
+import repository.UserDaoInterface;
+import service.UserService;
+import service.UserServiceInterface;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Scanner;
 
-public class Cli {
+public class ConsoleInterface {
     
-    private final UserDao userDao = new UserDao();
+    private final UserServiceInterface userService = new UserService();
     private final Scanner scanner = new Scanner(System.in);
     
     public void launch() {
-        int code = ModeConstants.OK;
-        while (code != ModeConstants.EXIT) {
+        InputMode code = InputMode.OTHER;
+        while (code != InputMode.EXIT) {
             code = startScreen();
             switch (code) {
-                case ModeConstants.GET_ALL -> getAll();
-                case ModeConstants.GET_USER -> getUser();
-                case ModeConstants.UPDATE -> updateUser();
-                case ModeConstants.SAVE -> saveUser();
-                case ModeConstants.DELETE -> deleteUser();
+                case GET_ALL -> getAll();
+                case GET_USER -> getUser();
+                case UPDATE -> updateUser();
+                case SAVE -> saveUser();
+                case DELETE -> deleteUser();
                 default -> {}
             }
         }
@@ -30,54 +37,54 @@ public class Cli {
     }
     
     private void getAll() {
-        int code = getAllScreen();
-        recallInput(code);
+        InputMode mode = getAllScreen();
+        recallInput(mode);
     }
     
     private void getUser() {
-        int code = getUserScreen(getUserInput());
-        recallInput(code);
+        InputMode mode = getUserScreen(getUserInput());
+        recallInput(mode);
     }
 
     private void updateUser() {
-        int code = updateUserScreen(updateUserInput());
-        recallInput(code);
+        InputMode mode = updateUserScreen(updateUserInput());
+        recallInput(mode);
     }
 
     private void saveUser() {
-        int code = saveUserScreen(saveUserInput());
-        recallInput(code);
+        InputMode mode = saveUserScreen(saveUserInput());
+        recallInput(mode);
     }
 
     private void deleteUser() {
-        int code = deleteUserScreen(deleteUserInput());
-        recallInput(code);
+        InputMode mode = deleteUserScreen(deleteUserInput());
+        recallInput(mode);
     }
 
-    private void recallInput(int code) {
-        while (code != ModeConstants.EXIT) {
+    private void recallInput(InputMode mode) {
+        while (mode != InputMode.EXIT) {
             System.out.println(TextConstants.INVALID_MODE);
-            code = getIntInput();
+            mode = getModeInput();
         }
     }
 
-    private int startScreen() {
+    private InputMode startScreen() {
         System.out.println(TextConstants.APP_NAME);
         System.out.println(TextConstants.CHOOSE_OPTION);
         for (int i = 0; i < TextConstants.START_OPTIONS.size(); ++i) {
             System.out.println(i + 1 + ": " + TextConstants.START_OPTIONS.get(i));
         }
         System.out.println(TextConstants.EXIT);
-        return getIntInput();
+        return getModeInput();
     }
 
-    private int getAllScreen() {
+    private InputMode getAllScreen() {
         System.out.println(TextConstants.APP_NAME);
         System.out.println("All users' id:");
-        userDao.getAllUsers().forEach(x -> System.out.println(x.getUuid()));
+        userService.getAllUsers().forEach(x -> System.out.println(x.getUuid()));
         System.out.println(TextConstants.CHOOSE_OPTION);
         System.out.println(TextConstants.EXIT);
-        return getIntInput();
+        return getModeInput();
     }
 
     private String getUserInput() {
@@ -86,80 +93,81 @@ public class Cli {
         return scanner.nextLine();
     }
 
-    private int getUserScreen(String uuid) {
+    private InputMode getUserScreen(String uuid) {
         System.out.println(uuid + " user info:");
-        System.out.println(userDao.getUserById(uuid));
+        UserDto userDto = UserMapper.UserEntityToDto(userService.getUserById(uuid));
+        System.out.println(userDto);
         System.out.println(TextConstants.CHOOSE_OPTION);
         System.out.println(TextConstants.EXIT);
-        return getIntInput();
+        return getModeInput();
     }
 
-    private int updateUserInput() {
+    private ResponseCode updateUserInput() {
         System.out.println(TextConstants.APP_NAME);
         System.out.println("Enter updating user's info in the next format\n(id must exist in the database):");
         System.out.println("id, name, surname, email, age");
         String input = scanner.nextLine();
-        User updatedUser = parseInput(input, false);
+        UserEntity updatedUser = parseInput(input, false);
         if (updatedUser == null) {
-            return ModeConstants.ERROR;
+            return ResponseCode.ERROR;
         }
-        return userDao.updateUser(updatedUser);
+        return userService.updateUser(updatedUser);
     }
 
-    private int updateUserScreen(int code) {
-        if (code == ModeConstants.OK) {
+    private InputMode updateUserScreen(ResponseCode code) {
+        if (code == ResponseCode.OK) {
             System.out.println("User was updated successfully");
         } else {
             System.out.println("User wasn't updated");
         }
         System.out.println(TextConstants.CHOOSE_OPTION);
         System.out.println(TextConstants.EXIT);
-        return getIntInput();
+        return getModeInput();
     }
 
-    private int saveUserInput() {
+    private ResponseCode saveUserInput() {
         System.out.println(TextConstants.APP_NAME);
         System.out.println("Enter new user's info in the next format:");
         System.out.println("name, surname, email, age");
         String input = "uuid, " + scanner.nextLine();
-        User newUser = parseInput(input, true);
-        return userDao.saveUser(newUser);
+        UserEntity newUser = parseInput(input, true);
+        return userService.saveUser(newUser);
     }
 
-    private int saveUserScreen(int code) {
-        if (code == ModeConstants.OK) {
+    private InputMode saveUserScreen(ResponseCode code) {
+        if (code == ResponseCode.OK) {
             System.out.println("User was saved successfully");
         } else {
             System.out.println("User wasn't saved");
         }
         System.out.println(TextConstants.CHOOSE_OPTION);
         System.out.println(TextConstants.EXIT);
-        return getIntInput();
+        return getModeInput();
     }
 
-    private int deleteUserInput() {
+    private ResponseCode deleteUserInput() {
         System.out.println(TextConstants.APP_NAME);
         System.out.println("Enter user's uuid:");
         String uuid = scanner.nextLine();
-        User toDelete = userDao.getUserById(uuid);
+        UserEntity toDelete = userService.getUserById(uuid);
         if (toDelete == null) {
-            return ModeConstants.ERROR;
+            return ResponseCode.ERROR;
         }
-        return userDao.deleteUser(toDelete);
+        return userService.deleteUser(toDelete);
     }
 
-    private int deleteUserScreen(int code) {
-        if (code == ModeConstants.OK) {
+    private InputMode deleteUserScreen(ResponseCode code) {
+        if (code == ResponseCode.OK) {
             System.out.println("User was deleted successfully");
         } else {
             System.out.println("User wasn't deleted");
         }
         System.out.println(TextConstants.CHOOSE_OPTION);
         System.out.println(TextConstants.EXIT);
-        return getIntInput();
+        return getModeInput();
     }
 
-    private User parseInput(String input, boolean isNewUser) {
+    private UserEntity parseInput(String input, boolean isNewUser) {
         if (input == null) {
             return null;
         }
@@ -176,11 +184,11 @@ public class Cli {
         } catch (NumberFormatException e) {
             return null;
         }
-        User user = new User(name, email, age);
+        UserEntity user = new UserEntity(name, email, age);
         if (isNewUser) {
             return user;
         }
-        User oldUser = userDao.getUserById(uuid);
+        UserEntity oldUser = userService.getUserById(uuid);
         if (oldUser == null) {
             return null;
         }
@@ -189,13 +197,15 @@ public class Cli {
         return user;
     }
 
-    private int getIntInput() {
-        int input;
+    private InputMode getModeInput() {
         try {
-            input = Integer.parseInt(scanner.nextLine());
+            int input = Integer.parseInt(scanner.nextLine());
+            Optional<InputMode> foundMode = Arrays.stream(InputMode.values())
+                    .filter(x -> x.getMenuCode() == input)
+                    .findAny();
+            return foundMode.orElse(InputMode.OTHER);
         } catch (NumberFormatException e) {
-            input = ModeConstants.ERROR;
+            return InputMode.OTHER;
         }
-        return input;
     }
 }

@@ -1,7 +1,7 @@
-import frontend.Cli;
+import console.ConsoleInterface;
 
 public class Main {
     public static void main(String[] args) {
-        new Cli().launch();
+        new ConsoleInterface().launch();
     }
 }
