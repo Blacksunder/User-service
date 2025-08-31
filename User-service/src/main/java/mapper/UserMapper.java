@@ -8,7 +8,6 @@ public class UserMapper {
         if (user == null) {
             return null;
         }
-        return new UserDto(user.getUuid(), user.getName(),
-                user.getEmail(), user.getAge(), user.getCreatedAt());
+        return new UserDto(user.getName(), user.getEmail(), user.getAge());
     }
 }

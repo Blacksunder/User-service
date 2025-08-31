@@ -13,15 +13,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UserDto {
 
-    private String uuid;
     private String name;
     private String email;
     private int age;
-    private LocalDateTime createdAt;
 
     @Override
     public String toString() {
         return "Name: " + name + ", email: " + email +
-                ", age: " + age + ", created at: " + createdAt;
+                ", age: " + age;
     }
 }
