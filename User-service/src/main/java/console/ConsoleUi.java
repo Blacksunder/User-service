@@ -6,8 +6,6 @@ import enums.ResponseCode;
 import mapper.UserMapper;
 import repository.HibernateUtil;
 import entity.UserEntity;
-import repository.UserDao;
-import repository.UserDaoInterface;
 import service.UserService;
 import service.UserServiceInterface;
 
@@ -15,7 +13,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Scanner;
 
-public class ConsoleInterface {
+public class ConsoleUi {
     
     private final UserServiceInterface userService = new UserService();
     private final Scanner scanner = new Scanner(System.in);
@@ -95,7 +93,8 @@ public class ConsoleInterface {
 
     private InputMode getUserScreen(String uuid) {
         System.out.println(uuid + " user info:");
-        UserDto userDto = UserMapper.UserEntityToDto(userService.getUserById(uuid));
+        UserMapper mapper = new UserMapper();
+        UserDto userDto = mapper.userEntityToDto(userService.getUserById(uuid));
         System.out.println(userDto);
         System.out.println(TextConstants.CHOOSE_OPTION);
         System.out.println(TextConstants.EXIT);

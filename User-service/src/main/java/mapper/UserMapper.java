@@ -4,7 +4,7 @@ import dto.UserDto;
 import entity.UserEntity;
 
 public class UserMapper {
-    public static UserDto UserEntityToDto(UserEntity user) {
+    public UserDto userEntityToDto(UserEntity user) {
         if (user == null) {
             return null;
         }
