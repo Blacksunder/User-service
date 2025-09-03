@@ -1,6 +1,7 @@
 package repository;
 
 import entity.UserEntity;
+import enums.ResponseCode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistry;
@@ -11,14 +12,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testng.AssertJUnit;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.as;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class UserDaoTest {
 
@@ -96,15 +94,65 @@ class UserDaoTest {
 
     @Test
     public void getAllUsers() {
+        List<UserEntity> expected = new ArrayList<>();
+        for (int i = 0; i < ids.size(); ++i) {
+            expected.add(new UserEntity(ids.get(i), names.get(i), emails.get(i), ages.get(i), time));
+        }
+        List<UserEntity> actual = userDao.getAllUsers();
 
+        assertEquals(actual.size(), expected.size());
+        for (int i = 0; i < expected.size(); ++i) {
+            assertTrue(compareUserEntityWithProxy(actual.get(i), expected.get(i)));
+        }
     }
 
     @Test
-    public void saveUser() {
+    public void saveUser_successfulSaving() {
+        UserEntity entity = new UserEntity("a", "b", "c", 5, time);
+        ResponseCode expected = ResponseCode.OK;
+
+        ResponseCode actual = userDao.saveUser(entity);
+        UserEntity savedEntity = userDao.getUserById("a");
+
+        assertEquals(expected, actual);
+        assertTrue(compareUserEntityWithProxy(savedEntity, entity));
     }
 
     @Test
-    public void updateUser() {
+    public void saveUser_failSaving() {
+        UserEntity entity = new UserEntity(ids.get(0), "b", "c", 5, time);
+        ResponseCode expected = ResponseCode.ERROR;
+
+        ResponseCode actual = userDao.saveUser(entity);
+        UserEntity dbEntity = userDao.getUserById(ids.get(0));
+
+        assertEquals(expected, actual);
+        assertFalse(compareUserEntityWithProxy(dbEntity, entity));
+    }
+
+    @Test
+    public void updateUser_successfulUpdating() {
+        UserEntity entity = new UserEntity(ids.get(0), names.get(1), emails.get(1), ages.get(1), time);
+        ResponseCode expectedCode = ResponseCode.OK;
+
+        ResponseCode actualCode = userDao.updateUser(entity);
+        UserEntity dbEntity = userDao.getUserById(ids.get(0));
+
+        assertEquals(expectedCode, actualCode);
+        assertTrue(compareUserEntityWithProxy(dbEntity, entity));
+    }
+
+    @Test
+    public void updateUser_failUpdating() {
+        UserEntity unexistedEntity = new UserEntity("a", "b", "c", 0, time);
+        UserEntity expectedEntity = new UserEntity(ids.get(0), names.get(0), emails.get(0), ages.get(0), time);
+        ResponseCode expectedCode = ResponseCode.ERROR;
+
+        ResponseCode actualCode = userDao.updateUser(unexistedEntity);
+        UserEntity dbEntity = userDao.getUserById(ids.get(0));
+
+        assertEquals(expectedCode, actualCode);
+        assertTrue(compareUserEntityWithProxy(dbEntity, expectedEntity));
     }
 
     @Test

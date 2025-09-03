@@ -56,16 +56,21 @@ public class UserDao implements UserDaoInterface {
             transaction.begin();
             switch (mode) {
                 case SAVE -> session.persist(user);
-                case UPDATE -> session.merge(user);
+                case UPDATE -> {
+                    if (getUserById(user.getUuid()) == null) {
+                        return ResponseCode.ERROR;
+                    }
+                    session.merge(user);
+                }
                 case DELETE -> session.remove(user);
                 default -> {}
             }
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null && (transaction.isActive() || transaction.getRollbackOnly())) {
+            if (transaction != null && transaction.getRollbackOnly()) {
                 transaction.rollback();
-                return ResponseCode.ERROR;
             }
+            return ResponseCode.ERROR;
         }
         return ResponseCode.OK;
     }
