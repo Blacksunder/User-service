@@ -156,7 +156,27 @@ class UserDaoTest {
     }
 
     @Test
-    public void deleteUser() {
+    public void deleteUser_successfulDelete() {
+        UserEntity existingEntity = new UserEntity(ids.get(0), names.get(0), emails.get(0), ages.get(0), time);
+        ResponseCode expectedCode = ResponseCode.OK;
+
+        ResponseCode actualCode = userDao.deleteUser(existingEntity);
+        UserEntity dbEntity = userDao.getUserById(ids.get(0));
+
+        assertEquals(expectedCode, actualCode);
+        assertNull(dbEntity);
+    }
+
+    @Test
+    public void deleteUser_failDelete() {
+        UserEntity unexistingEntity = new UserEntity("aaaaa", "fgdfg", "dgdfg", 0, time);
+        ResponseCode expectedCode = ResponseCode.ERROR;
+
+        ResponseCode actualCode = userDao.deleteUser(unexistingEntity);
+        UserEntity dbEntity = userDao.getUserById(ids.get(0));
+
+        assertEquals(expectedCode, actualCode);
+        assertNotNull(dbEntity);
     }
 
     private static boolean compareUserEntityWithProxy(UserEntity actual, UserEntity expected) {

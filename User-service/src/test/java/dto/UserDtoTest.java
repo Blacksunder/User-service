@@ -36,4 +36,14 @@ public class UserDtoTest {
 
         assertNotEquals(dto1, null);
     }
+
+    @Test
+    public void toString_checkForCorrectString() {
+        UserDto userDto = new UserDto("a", "b", 10);
+        String expected = "Name: a, email: b, age: 10";
+
+        String actual = userDto.toString();
+
+        assertEquals(expected, actual);
+    }
 }

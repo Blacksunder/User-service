@@ -8,7 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class UserDto {
-
     private String name;
     private String email;
     private int age;

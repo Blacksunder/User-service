@@ -3,6 +3,8 @@ package console;
 import dto.UserDto;
 import enums.InputMode;
 import enums.ResponseCode;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import mapper.UserMapper;
 import repository.HibernateUtil;
 import entity.UserEntity;
@@ -13,8 +15,8 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Scanner;
 
+@AllArgsConstructor
 public class ConsoleUi {
-    
     private final UserServiceInterface userService = new UserService();
     private final Scanner scanner = new Scanner(System.in);
     
@@ -107,9 +109,6 @@ public class ConsoleUi {
         System.out.println("id, name, surname, email, age");
         String input = scanner.nextLine();
         UserEntity updatedUser = parseInput(input, false);
-        if (updatedUser == null) {
-            return ResponseCode.ERROR;
-        }
         return userService.updateUser(updatedUser);
     }
 
@@ -149,9 +148,6 @@ public class ConsoleUi {
         System.out.println("Enter user's uuid:");
         String uuid = scanner.nextLine();
         UserEntity toDelete = userService.getUserById(uuid);
-        if (toDelete == null) {
-            return ResponseCode.ERROR;
-        }
         return userService.deleteUser(toDelete);
     }
 
@@ -166,7 +162,7 @@ public class ConsoleUi {
         return getModeInput();
     }
 
-    private UserEntity parseInput(String input, boolean isNewUser) {
+    protected UserEntity parseInput(String input, boolean isNewUser) {
         if (input == null) {
             return null;
         }

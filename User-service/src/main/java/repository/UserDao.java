@@ -12,7 +12,6 @@ import java.util.List;
 
 @AllArgsConstructor
 public class UserDao implements UserDaoInterface {
-
     private final SessionFactory sessionFactory;
 
     public UserDao() {
@@ -57,12 +56,17 @@ public class UserDao implements UserDaoInterface {
             switch (mode) {
                 case SAVE -> session.persist(user);
                 case UPDATE -> {
-                    if (getUserById(user.getUuid()) == null) {
+                    if (checkUnexistedUser(user)) {
                         return ResponseCode.ERROR;
                     }
                     session.merge(user);
                 }
-                case DELETE -> session.remove(user);
+                case DELETE -> {
+                    if (checkUnexistedUser(user)) {
+                        return ResponseCode.ERROR;
+                    }
+                    session.remove(user);
+                }
                 default -> {}
             }
             transaction.commit();
@@ -73,5 +77,9 @@ public class UserDao implements UserDaoInterface {
             return ResponseCode.ERROR;
         }
         return ResponseCode.OK;
+    }
+
+    private boolean checkUnexistedUser(UserEntity user) {
+        return getUserById(user.getUuid()) == null;
     }
 }
