@@ -28,4 +28,11 @@ public class UserMapperTest {
 
         assertNotEquals(actual, expected);
     }
+
+    @Test
+    public void userEntityToDto_mappingNull() {
+        UserMapper mapper = new UserMapper();
+
+        assertNull(mapper.userEntityToDto(null));
+    }
 }

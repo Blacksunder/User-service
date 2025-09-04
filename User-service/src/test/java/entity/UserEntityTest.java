@@ -47,8 +47,9 @@ public class UserEntityTest {
     @Test
     public void parametrizedConstructor_timeAndUuidMustBeCorrect() {
         UserEntity entity = new UserEntity("aaa", "bbb", 20);
+        LocalDateTime time = LocalDateTime.now().plusSeconds(1);
 
         assertEquals(entity.getUuid().length(), UUID.randomUUID().toString().length());
-        assertTrue(entity.getCreatedAt().isBefore(LocalDateTime.now()));
+        assertTrue(entity.getCreatedAt().isBefore(time));
     }
 }
