@@ -11,7 +11,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.time.LocalDateTime;
@@ -20,7 +19,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserDaoTest {
-
     protected static PostgreSQLContainer<?> postgreSQLContainer;
     protected static SessionFactory sessionFactory;
     private static UserDaoInterface userDao;
@@ -129,7 +127,7 @@ class UserDaoTest {
         ResponseCode expected = ResponseCode.ERROR;
 
         ResponseCode actual = userDao.saveUser(entity);
-        UserEntity dbEntity = null;
+        UserEntity dbEntity;
         try (Session session = sessionFactory.openSession()) {
             dbEntity = session.get(UserEntity.class, ids.get(0));
         }

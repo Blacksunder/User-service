@@ -12,7 +12,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
-
     private final UserDao mockUserDao = Mockito.mock(UserDao.class);
     private final UserServiceInterface userService = new UserService(mockUserDao);
     private final LocalDateTime time = LocalDateTime.now();
