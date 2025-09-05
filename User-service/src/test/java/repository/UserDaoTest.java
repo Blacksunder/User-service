@@ -11,6 +11,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.time.LocalDateTime;
@@ -98,6 +99,7 @@ class UserDaoTest {
         for (int i = 0; i < ids.size(); ++i) {
             expected.add(new UserEntity(ids.get(i), names.get(i), emails.get(i), ages.get(i), time));
         }
+
         List<UserEntity> actual = userDao.getAllUsers();
 
         assertEquals(actual.size(), expected.size());
@@ -112,10 +114,13 @@ class UserDaoTest {
         ResponseCode expected = ResponseCode.OK;
 
         ResponseCode actual = userDao.saveUser(entity);
-        UserEntity savedEntity = userDao.getUserById("a");
+        UserEntity dbEntity;
+        try (Session session = sessionFactory.openSession()) {
+            dbEntity = session.get(UserEntity.class, "a");
+        }
 
         assertEquals(expected, actual);
-        assertTrue(compareUserEntityWithProxy(savedEntity, entity));
+        assertTrue(compareUserEntityWithProxy(dbEntity, entity));
     }
 
     @Test
@@ -124,7 +129,10 @@ class UserDaoTest {
         ResponseCode expected = ResponseCode.ERROR;
 
         ResponseCode actual = userDao.saveUser(entity);
-        UserEntity dbEntity = userDao.getUserById(ids.get(0));
+        UserEntity dbEntity = null;
+        try (Session session = sessionFactory.openSession()) {
+            dbEntity = session.get(UserEntity.class, ids.get(0));
+        }
 
         assertEquals(expected, actual);
         assertFalse(compareUserEntityWithProxy(dbEntity, entity));
@@ -136,7 +144,10 @@ class UserDaoTest {
         ResponseCode expectedCode = ResponseCode.OK;
 
         ResponseCode actualCode = userDao.updateUser(entity);
-        UserEntity dbEntity = userDao.getUserById(ids.get(0));
+        UserEntity dbEntity;
+        try (Session session = sessionFactory.openSession()) {
+            dbEntity = session.get(UserEntity.class, ids.get(0));
+        }
 
         assertEquals(expectedCode, actualCode);
         assertTrue(compareUserEntityWithProxy(dbEntity, entity));
@@ -149,7 +160,10 @@ class UserDaoTest {
         ResponseCode expectedCode = ResponseCode.ERROR;
 
         ResponseCode actualCode = userDao.updateUser(unexistedEntity);
-        UserEntity dbEntity = userDao.getUserById(ids.get(0));
+        UserEntity dbEntity;
+        try (Session session = sessionFactory.openSession()) {
+            dbEntity = session.get(UserEntity.class, ids.get(0));
+        }
 
         assertEquals(expectedCode, actualCode);
         assertTrue(compareUserEntityWithProxy(dbEntity, expectedEntity));
@@ -161,7 +175,10 @@ class UserDaoTest {
         ResponseCode expectedCode = ResponseCode.OK;
 
         ResponseCode actualCode = userDao.deleteUser(existingEntity);
-        UserEntity dbEntity = userDao.getUserById(ids.get(0));
+        UserEntity dbEntity;
+        try (Session session = sessionFactory.openSession()) {
+            dbEntity = session.get(UserEntity.class, ids.get(0));
+        }
 
         assertEquals(expectedCode, actualCode);
         assertNull(dbEntity);
@@ -173,7 +190,10 @@ class UserDaoTest {
         ResponseCode expectedCode = ResponseCode.ERROR;
 
         ResponseCode actualCode = userDao.deleteUser(unexistingEntity);
-        UserEntity dbEntity = userDao.getUserById(ids.get(0));
+        UserEntity dbEntity;
+        try (Session session = sessionFactory.openSession()) {
+            dbEntity = session.get(UserEntity.class, ids.get(0));
+        }
 
         assertEquals(expectedCode, actualCode);
         assertNotNull(dbEntity);
