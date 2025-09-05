@@ -3,16 +3,18 @@ package service;
 import entity.UserEntity;
 import enums.ResponseCode;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import repository.UserDao;
 import repository.UserDaoInterface;
 
 import java.util.List;
 
 @AllArgsConstructor
-@NoArgsConstructor
 public class UserService implements UserServiceInterface {
-    private UserDaoInterface userDao = new UserDao();
+    private final UserDaoInterface userDao;
+
+    public UserService() {
+        userDao = new UserDao();
+    }
 
     @Override
     public UserEntity getUserById(String uuid) {
