@@ -162,7 +162,7 @@ public class ConsoleUi {
         return getModeInput();
     }
 
-    protected UserEntity parseInput(String input, boolean isNewUser) {
+    private UserEntity parseInput(String input, boolean isNewUser) {
         if (input == null) {
             return null;
         }

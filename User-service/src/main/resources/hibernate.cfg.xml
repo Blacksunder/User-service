@@ -18,6 +18,5 @@
 
         <!-- Entity classes -->
         <mapping class="entity.UserEntity"/>
-
     </session-factory>
 </hibernate-configuration>
