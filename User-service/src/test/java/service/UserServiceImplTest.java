@@ -4,16 +4,16 @@ import entity.UserEntity;
 import enums.ResponseCode;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import repository.UserDaoInterface;
+import repository.UserDao;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserServiceTest {
-    private final UserDaoInterface mockUserDao = Mockito.mock(UserDaoInterface.class);
-    private final UserServiceInterface userService = new UserService(mockUserDao);
+public class UserServiceImplTest {
+    private final UserDao mockUserDao = Mockito.mock(UserDao.class);
+    private final UserService userService = new UserServiceImpl(mockUserDao);
     private final LocalDateTime time = LocalDateTime.now();
     private final UserEntity expected = new UserEntity("100", "aaa", "bbb", 10, time);
 

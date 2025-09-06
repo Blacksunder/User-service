@@ -4,12 +4,11 @@ import dto.UserDto;
 import enums.InputMode;
 import enums.ResponseCode;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import mapper.UserMapper;
 import repository.HibernateUtil;
 import entity.UserEntity;
+import service.UserServiceImpl;
 import service.UserService;
-import service.UserServiceInterface;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -17,7 +16,7 @@ import java.util.Scanner;
 
 @AllArgsConstructor
 public class ConsoleUi {
-    private final UserServiceInterface userService = new UserService();
+    private final UserService userService = new UserServiceImpl();
     private final Scanner scanner = new Scanner(System.in);
     
     public void launch() {

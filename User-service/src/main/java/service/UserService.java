@@ -2,42 +2,19 @@ package service;
 
 import entity.UserEntity;
 import enums.ResponseCode;
-import lombok.AllArgsConstructor;
-import repository.UserDao;
-import repository.UserDaoInterface;
 
 import java.util.List;
 
-@AllArgsConstructor
-public class UserService implements UserServiceInterface {
-    private final UserDaoInterface userDao;
+public interface UserService {
 
-    public UserService() {
-        userDao = new UserDao();
-    }
+    UserEntity getUserById(String uuid);
 
-    @Override
-    public UserEntity getUserById(String uuid) {
-        return userDao.getUserById(uuid);
-    }
+    List<UserEntity> getAllUsers();
 
-    @Override
-    public List<UserEntity> getAllUsers() {
-        return userDao.getAllUsers();
-    }
+    ResponseCode saveUser(UserEntity user);
 
-    @Override
-    public ResponseCode saveUser(UserEntity user) {
-        return userDao.saveUser(user);
-    }
+    ResponseCode updateUser(UserEntity user);
 
-    @Override
-    public ResponseCode updateUser(UserEntity user) {
-        return userDao.updateUser(user);
-    }
+    ResponseCode deleteUser(UserEntity user);
 
-    @Override
-    public ResponseCode deleteUser(UserEntity user) {
-        return userDao.deleteUser(user);
-    }
 }
