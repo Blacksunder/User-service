@@ -1,8 +1,10 @@
-package mapper;
+package com.userservice.mapper;
 
-import dto.UserDto;
-import entity.UserEntity;
+import com.userservice.dto.UserDto;
+import com.userservice.entity.UserEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserMapper {
     public UserDto userEntityToDto(UserEntity user) {
         if (user == null) {

@@ -1,4 +1,4 @@
-package dto;
+package com.userservice.dto;
 
 import lombok.*;
 

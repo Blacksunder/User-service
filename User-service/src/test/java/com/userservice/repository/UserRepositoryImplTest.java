@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static repository.TestConstants.*;
 import static repository.HibernateConfigurer.sessionFactory;
 
-class UserDaoImplTest {
+class UserRepositoryImplTest {
     private static final HibernateConfigurer hibernateConfigurer = new HibernateConfigurer();
     private static UserDao userDao;
 

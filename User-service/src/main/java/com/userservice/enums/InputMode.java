@@ -1,4 +1,4 @@
-package enums;
+package com.userservice.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,14 +1,13 @@
-package console;
+package com.userservice.console;
 
-import dto.UserDto;
-import enums.InputMode;
-import enums.ResponseCode;
+import com.userservice.dto.UserDto;
+import com.userservice.enums.InputMode;
+import com.userservice.enums.ResponseCode;
 import lombok.AllArgsConstructor;
-import mapper.UserMapper;
-import repository.HibernateUtil;
-import entity.UserEntity;
-import service.UserServiceImpl;
-import service.UserService;
+import com.userservice.mapper.UserMapper;
+import com.userservice.entity.UserEntity;
+import com.userservice.service.UserServiceImpl;
+import com.userservice.service.UserService;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -32,7 +31,7 @@ public class ConsoleUi {
                 default -> {}
             }
         }
-        HibernateUtil.shutDown();
+//        HibernateUtil.shutDown();
     }
     
     private void getAll() {

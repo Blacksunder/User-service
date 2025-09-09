@@ -1,22 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-configuration PUBLIC
-        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
+<!--<!DOCTYPE hibernate-configuration PUBLIC-->
+<!--        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"-->
+<!--        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">-->
 
-<hibernate-configuration>
-    <session-factory>
-        <!-- Database connection settings -->
-        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
-        <property name="hibernate.connection.url">jdbc:postgresql://192.168.99.100:5432/mydatabase</property>
-        <property name="hibernate.connection.username">user</property>
-        <property name="hibernate.connection.password">password</property>
+<!--<hibernate-configuration>-->
+<!--    <session-factory>-->
+<!--        &lt;!&ndash; Database connection settings &ndash;&gt;-->
+<!--        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>-->
+<!--        <property name="hibernate.connection.url">jdbc:postgresql://192.168.99.100:5432/mydatabase</property>-->
+<!--        <property name="hibernate.connection.username">user</property>-->
+<!--        <property name="hibernate.connection.password">password</property>-->
 
-        <property name="hibernate.format_sql">true</property>
+<!--        <property name="hibernate.format_sql">true</property>-->
 
-        <!-- Update the database schema on startup -->
-        <property name="hibernate.hbm2ddl.auto">update</property>
+<!--        &lt;!&ndash; Update the database schema on startup &ndash;&gt;-->
+<!--        <property name="hibernate.hbm2ddl.auto">update</property>-->
 
-        <!-- Entity classes -->
-        <mapping class="entity.UserEntity"/>
-    </session-factory>
-</hibernate-configuration>
+<!--        &lt;!&ndash; Entity classes &ndash;&gt;-->
+<!--        <mapping class="entity.UserEntity"/>-->
+<!--    </session-factory>-->
+<!--</hibernate-configuration>-->

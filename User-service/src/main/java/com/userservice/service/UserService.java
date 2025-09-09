@@ -1,11 +1,11 @@
-package repository;
+package com.userservice.service;
 
-import entity.UserEntity;
-import enums.ResponseCode;
+import com.userservice.entity.UserEntity;
+import com.userservice.enums.ResponseCode;
 
 import java.util.List;
 
-public interface UserDao {
+public interface UserService {
 
     UserEntity getUserById(String uuid);
 

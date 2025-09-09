@@ -1,4 +1,4 @@
-package console;
+package com.userservice.console;
 
 import java.util.List;
 
