@@ -15,6 +15,6 @@ public interface UserService {
 
     ResponseCode updateUser(UserEntity user);
 
-    ResponseCode deleteUser(UserEntity user);
+    ResponseCode deleteUser(String uuid);
 
 }

@@ -1,4 +1,4 @@
-package repository;
+package com.userservice.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;

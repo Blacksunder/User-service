@@ -1,7 +1,7 @@
-package mapper;
+package com.userservice.mapper;
 
-import dto.UserDto;
-import entity.UserEntity;
+import com.userservice.dto.UserDto;
+import com.userservice.entity.UserEntity;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

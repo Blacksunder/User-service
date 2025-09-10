@@ -39,7 +39,7 @@ public class UserDataController {
         UserEntity userEntity = userService.getUserById(uuid);
         if (userEntity == null) {
             return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
+                    .status(HttpStatus.NOT_FOUND)
                     .body("User not found");
         }
         UserDto userDto = userMapper.userEntityToDto(userEntity);
@@ -71,8 +71,8 @@ public class UserDataController {
         ResponseCode responseCode = userService.updateUser(userEntity);
         if (responseCode == ResponseCode.ERROR) {
             return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("User already exists");
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("User doesn't exist");
         }
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -81,12 +81,10 @@ public class UserDataController {
 
     @DeleteMapping("/delete/{uuid}")
     public ResponseEntity<?> delete(@PathVariable("uuid") String uuid) {
-        UserEntity entity = new UserEntity();
-        entity.setUuid(uuid);
-        ResponseCode responseCode = userService.deleteUser(entity);
+        ResponseCode responseCode = userService.deleteUser(uuid);
         if (responseCode == ResponseCode.ERROR) {
             return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
+                    .status(HttpStatus.NOT_FOUND)
                     .body("User doesn't exists");
         }
         return ResponseEntity

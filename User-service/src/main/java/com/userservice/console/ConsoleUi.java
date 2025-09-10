@@ -145,8 +145,7 @@ public class ConsoleUi {
         System.out.println(TextConstants.APP_NAME);
         System.out.println("Enter user's uuid:");
         String uuid = scanner.nextLine();
-        UserEntity toDelete = userService.getUserById(uuid);
-        return userService.deleteUser(toDelete);
+        return userService.deleteUser(uuid);
     }
 
     private InputMode deleteUserScreen(ResponseCode code) {

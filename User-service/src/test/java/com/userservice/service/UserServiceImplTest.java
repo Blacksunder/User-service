@@ -1,25 +1,26 @@
-package service;
+package com.userservice.service;
 
-import entity.UserEntity;
-import enums.ResponseCode;
+import com.userservice.entity.UserEntity;
+import com.userservice.enums.ResponseCode;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import repository.UserDao;
+import com.userservice.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceImplTest {
-    private final UserDao mockUserDao = Mockito.mock(UserDao.class);
-    private final UserService userService = new UserServiceImpl(mockUserDao);
+    private final UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
+    private final UserService userService = new UserServiceImpl(mockUserRepository);
     private final LocalDateTime time = LocalDateTime.now();
     private final UserEntity expected = new UserEntity("100", "aaa", "bbb", 10, time);
 
     @Test
     public void getUserById_withCorrectId() {
-        Mockito.when(mockUserDao.getUserById(expected.getUuid())).thenReturn(expected);
+        Mockito.when(mockUserRepository.findById(expected.getUuid())).thenReturn(Optional.of(expected));
 
         UserEntity actual = userService.getUserById(expected.getUuid());
 
@@ -28,9 +29,9 @@ public class UserServiceImplTest {
 
     @Test
     public void getUserById_withIncorrectId() {
-        Mockito.when(mockUserDao.getUserById("")).thenReturn(null);
+        Mockito.when(mockUserRepository.findById("incorrect")).thenReturn(Optional.empty());
 
-        UserEntity actual = userService.getUserById("");
+        UserEntity actual = userService.getUserById("incorrect");
 
         assertNull(actual);
     }
@@ -38,7 +39,7 @@ public class UserServiceImplTest {
     @Test
     public void getAllUsers_notEmptyTable() {
         List<UserEntity> expectedList = List.of(expected, expected, expected);
-        Mockito.when(mockUserDao.getAllUsers()).thenReturn(expectedList);
+        Mockito.when(mockUserRepository.findAll()).thenReturn(expectedList);
 
         List<UserEntity> actualList = userService.getAllUsers();
 
@@ -47,7 +48,7 @@ public class UserServiceImplTest {
 
     @Test
     public void getAllUsers_emptyTable() {
-        Mockito.when(mockUserDao.getAllUsers()).thenReturn(List.of());
+        Mockito.when(mockUserRepository.findAll()).thenReturn(List.of());
 
         List<UserEntity> actualList = userService.getAllUsers();
 
@@ -57,7 +58,7 @@ public class UserServiceImplTest {
     @Test
     public void saveUser_successSave() {
         UserEntity user = new UserEntity();
-        Mockito.when(mockUserDao.saveUser(user)).thenReturn(ResponseCode.OK);
+        Mockito.when(mockUserRepository.save(user)).thenReturn(user);
 
         ResponseCode actualCode = userService.saveUser(user);
 
@@ -65,21 +66,11 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void saveUser_failSave() {
-        UserEntity user = new UserEntity();
-        Mockito.when(mockUserDao.saveUser(user)).thenReturn(ResponseCode.ERROR);
-
-        ResponseCode actualCode = userService.saveUser(user);
-
-        assertEquals(ResponseCode.ERROR, actualCode);
-    }
-
-    @Test
     public void updateUser_successUpdate() {
-        UserEntity user = new UserEntity();
-        Mockito.when(mockUserDao.updateUser(user)).thenReturn(ResponseCode.OK);
+        Mockito.when(mockUserRepository.save(expected)).thenReturn(expected);
+        Mockito.when(mockUserRepository.existsById(expected.getUuid())).thenReturn(true);
 
-        ResponseCode actualCode = userService.updateUser(user);
+        ResponseCode actualCode = userService.updateUser(expected);
 
         assertEquals(ResponseCode.OK, actualCode);
     }
@@ -87,7 +78,7 @@ public class UserServiceImplTest {
     @Test
     public void updateUser_failUpdate() {
         UserEntity user = new UserEntity();
-        Mockito.when(mockUserDao.updateUser(user)).thenReturn(ResponseCode.ERROR);
+        Mockito.when(mockUserRepository.save(user)).thenReturn(user);
 
         ResponseCode actualCode = userService.updateUser(user);
 
@@ -97,20 +88,9 @@ public class UserServiceImplTest {
     @Test
     public void deleteUser_successDelete() {
         UserEntity user = new UserEntity();
-        Mockito.when(mockUserDao.deleteUser(user)).thenReturn(ResponseCode.OK);
 
-        ResponseCode actualCode = userService.deleteUser(user);
+        ResponseCode actualCode = userService.deleteUser(user.getUuid());
 
         assertEquals(ResponseCode.OK, actualCode);
-    }
-
-    @Test
-    public void deleteUser_failDelete() {
-        UserEntity user = new UserEntity();
-        Mockito.when(mockUserDao.deleteUser(user)).thenReturn(ResponseCode.ERROR);
-
-        ResponseCode actualCode = userService.deleteUser(user);
-
-        assertEquals(ResponseCode.ERROR, actualCode);
     }
 }

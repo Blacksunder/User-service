@@ -1,4 +1,4 @@
-package dto;
+package com.userservice.dto;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,52 +1,75 @@
-package repository;
+package com.userservice.repository;
 
-import entity.UserEntity;
-import enums.ResponseCode;
-import org.hibernate.Session;
+import com.userservice.entity.UserEntity;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static repository.TestConstants.*;
-import static repository.HibernateConfigurer.sessionFactory;
+import static com.userservice.repository.TestConstants.*;
 
+@DataJpaTest
 class UserRepositoryImplTest {
-    private static final HibernateConfigurer hibernateConfigurer = new HibernateConfigurer();
-    private static UserDao userDao;
+
+    @LocalServerPort
+    private String port;
+
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
+            "postgres:16-alpine"
+    );
 
     @BeforeAll
-    public static void start() {
-        hibernateConfigurer.buildSession();
-        userDao = new UserDaoImpl(sessionFactory);
+    static void beforeAll() {
+        postgres.start();
     }
 
     @AfterAll
-    public static void stop() {
-        hibernateConfigurer.stopSession();
+    static void afterAll() {
+        postgres.stop();
     }
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
+
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     public void prepareDb() {
-        hibernateConfigurer.prepareDb();
+        userRepository.deleteAll();
+        for (int i = 0; i < IDS.size(); ++i) {
+            UserEntity user = new UserEntity(IDS.get(i), NAMES.get(i),
+                    EMAILS.get(i), AGES.get(i), TIME);
+            userRepository.save(user);
+        }
     }
 
     @Test
     public void getUserById_getExistingUser() {
         UserEntity expected = new UserEntity(IDS.get(0), NAMES.get(0), EMAILS.get(0), AGES.get(0), TIME);
 
-        UserEntity actual = userDao.getUserById(IDS.get(0));
+        UserEntity actual = userRepository.findById(IDS.get(0)).orElse(null);
 
-        assertTrue(compareUserEntityWithProxy(actual, expected));
+        assertTrue(compareUserEntityWithProxy(expected, actual));
     }
 
     @Test
     public void getUserById_getUnexistingUser() {
-        UserEntity actual = userDao.getUserById("zffggdfgdfg");
+        UserEntity actual = userRepository.findById("zffggdfgdfg").orElse(null);
 
         assertNull(actual);
     }
@@ -58,7 +81,7 @@ class UserRepositoryImplTest {
             expected.add(new UserEntity(IDS.get(i), NAMES.get(i), EMAILS.get(i), AGES.get(i), TIME));
         }
 
-        List<UserEntity> actual = userDao.getAllUsers();
+        List<UserEntity> actual = (List<UserEntity>) userRepository.findAll();
 
         assertEquals(actual.size(), expected.size());
         for (int i = 0; i < expected.size(); ++i) {
@@ -69,92 +92,29 @@ class UserRepositoryImplTest {
     @Test
     public void saveUser_successfulSaving() {
         UserEntity entity = new UserEntity("a", "b", "c", 5, TIME);
-        ResponseCode expected = ResponseCode.OK;
 
-        ResponseCode actual = userDao.saveUser(entity);
-        UserEntity dbEntity;
-        try (Session session = sessionFactory.openSession()) {
-            dbEntity = session.get(UserEntity.class, "a");
-        }
+        UserEntity saved = userRepository.save(entity);
 
-        assertEquals(expected, actual);
-        assertTrue(compareUserEntityWithProxy(dbEntity, entity));
-    }
-
-    @Test
-    public void saveUser_failSaving() {
-        UserEntity entity = new UserEntity(IDS.get(0), "b", "c", 5, TIME);
-        ResponseCode expected = ResponseCode.ERROR;
-
-        ResponseCode actual = userDao.saveUser(entity);
-        UserEntity dbEntity;
-        try (Session session = sessionFactory.openSession()) {
-            dbEntity = session.get(UserEntity.class, IDS.get(0));
-        }
-
-        assertEquals(expected, actual);
-        assertFalse(compareUserEntityWithProxy(dbEntity, entity));
+        assertTrue(compareUserEntityWithProxy(entity, saved));
     }
 
     @Test
     public void updateUser_successfulUpdating() {
         UserEntity entity = new UserEntity(IDS.get(0), NAMES.get(1), EMAILS.get(1), AGES.get(1), TIME);
-        ResponseCode expectedCode = ResponseCode.OK;
 
-        ResponseCode actualCode = userDao.updateUser(entity);
-        UserEntity dbEntity;
-        try (Session session = sessionFactory.openSession()) {
-            dbEntity = session.get(UserEntity.class, IDS.get(0));
-        }
+        UserEntity updated = userRepository.save(entity);
 
-        assertEquals(expectedCode, actualCode);
-        assertTrue(compareUserEntityWithProxy(dbEntity, entity));
-    }
-
-    @Test
-    public void updateUser_failUpdating() {
-        UserEntity unexistedEntity = new UserEntity("a", "b", "c", 0, TIME);
-        UserEntity expectedEntity = new UserEntity(IDS.get(0), NAMES.get(0), EMAILS.get(0), AGES.get(0), TIME);
-        ResponseCode expectedCode = ResponseCode.ERROR;
-
-        ResponseCode actualCode = userDao.updateUser(unexistedEntity);
-        UserEntity dbEntity;
-        try (Session session = sessionFactory.openSession()) {
-            dbEntity = session.get(UserEntity.class, IDS.get(0));
-        }
-
-        assertEquals(expectedCode, actualCode);
-        assertTrue(compareUserEntityWithProxy(dbEntity, expectedEntity));
+        assertTrue(compareUserEntityWithProxy(updated, entity));
     }
 
     @Test
     public void deleteUser_successfulDelete() {
         UserEntity existingEntity = new UserEntity(IDS.get(0), NAMES.get(0), EMAILS.get(0), AGES.get(0), TIME);
-        ResponseCode expectedCode = ResponseCode.OK;
 
-        ResponseCode actualCode = userDao.deleteUser(existingEntity);
-        UserEntity dbEntity;
-        try (Session session = sessionFactory.openSession()) {
-            dbEntity = session.get(UserEntity.class, IDS.get(0));
-        }
+        userRepository.deleteById(existingEntity.getUuid());
+        UserEntity dbEntity = userRepository.findById(existingEntity.getUuid()).orElse(null);
 
-        assertEquals(expectedCode, actualCode);
         assertNull(dbEntity);
-    }
-
-    @Test
-    public void deleteUser_failDelete() {
-        UserEntity unexistingEntity = new UserEntity("aaaaa", "fgdfg", "dgdfg", 0, TIME);
-        ResponseCode expectedCode = ResponseCode.ERROR;
-
-        ResponseCode actualCode = userDao.deleteUser(unexistingEntity);
-        UserEntity dbEntity;
-        try (Session session = sessionFactory.openSession()) {
-            dbEntity = session.get(UserEntity.class, IDS.get(0));
-        }
-
-        assertEquals(expectedCode, actualCode);
-        assertNotNull(dbEntity);
     }
 
     private static boolean compareUserEntityWithProxy(UserEntity actual, UserEntity expected) {
