@@ -25,7 +25,7 @@ class UserRepositoryImplTest {
     private String port;
 
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-            "postgres:16-alpine"
+            "postgres:15-alpine"
     );
 
     @BeforeAll

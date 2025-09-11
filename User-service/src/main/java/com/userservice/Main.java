@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackageClasses = UserEntity.class)
 public class Main {
     public static void main(String[] args) {
-//        new ConsoleUi().launch();
         SpringApplication.run(Main.class, args);
     }
 }

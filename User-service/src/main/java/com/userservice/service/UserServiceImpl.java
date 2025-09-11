@@ -46,10 +46,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public ResponseCode updateUser(UserEntity user) {
-        if (user == null || !userRepository.existsById(user.getUuid())) {
+        UserEntity dbEntity = userRepository.findById(user.getUuid()).orElse(null);
+        if (dbEntity == null) {
             return ResponseCode.ERROR;
         }
         try {
+            user.setCreatedAt(dbEntity.getCreatedAt());
             userRepository.save(user);
             return ResponseCode.OK;
         } catch (Exception e) {
@@ -57,8 +59,13 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Transactional
     @Override
     public ResponseCode deleteUser(String uuid) {
+        UserEntity dbEntity = userRepository.findById(uuid).orElse(null);
+        if (dbEntity == null) {
+            return ResponseCode.ERROR;
+        }
         try {
             userRepository.deleteById(uuid);
             return ResponseCode.OK;

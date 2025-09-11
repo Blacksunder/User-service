@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 public class UserServiceImplTest {
     private final UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
@@ -29,9 +30,9 @@ public class UserServiceImplTest {
 
     @Test
     public void getUserById_withIncorrectId() {
-        Mockito.when(mockUserRepository.findById("incorrect")).thenReturn(Optional.empty());
+        Mockito.when(mockUserRepository.findById(expected.getUuid())).thenReturn(Optional.empty());
 
-        UserEntity actual = userService.getUserById("incorrect");
+        UserEntity actual = userService.getUserById(expected.getUuid());
 
         assertNull(actual);
     }
@@ -57,10 +58,9 @@ public class UserServiceImplTest {
 
     @Test
     public void saveUser_successSave() {
-        UserEntity user = new UserEntity();
-        Mockito.when(mockUserRepository.save(user)).thenReturn(user);
+        Mockito.when(mockUserRepository.save(expected)).thenReturn(expected);
 
-        ResponseCode actualCode = userService.saveUser(user);
+        ResponseCode actualCode = userService.saveUser(expected);
 
         assertEquals(ResponseCode.OK, actualCode);
     }
@@ -68,7 +68,7 @@ public class UserServiceImplTest {
     @Test
     public void updateUser_successUpdate() {
         Mockito.when(mockUserRepository.save(expected)).thenReturn(expected);
-        Mockito.when(mockUserRepository.existsById(expected.getUuid())).thenReturn(true);
+        Mockito.when(mockUserRepository.findById(any(String.class))).thenReturn(Optional.of(new UserEntity()));
 
         ResponseCode actualCode = userService.updateUser(expected);
 
@@ -77,20 +77,29 @@ public class UserServiceImplTest {
 
     @Test
     public void updateUser_failUpdate() {
-        UserEntity user = new UserEntity();
-        Mockito.when(mockUserRepository.save(user)).thenReturn(user);
+        Mockito.when(mockUserRepository.save(expected)).thenReturn(expected);
 
-        ResponseCode actualCode = userService.updateUser(user);
+        ResponseCode actualCode = userService.updateUser(expected);
 
         assertEquals(ResponseCode.ERROR, actualCode);
     }
 
     @Test
     public void deleteUser_successDelete() {
-        UserEntity user = new UserEntity();
+        Mockito.when(mockUserRepository.findById(any(String.class))).thenReturn(Optional.of(new UserEntity()));
+        Mockito.doNothing().when(mockUserRepository).deleteById(any(String.class));
 
-        ResponseCode actualCode = userService.deleteUser(user.getUuid());
+        ResponseCode actualCode = userService.deleteUser(expected.getUuid());
 
         assertEquals(ResponseCode.OK, actualCode);
+    }
+
+    @Test
+    public void deleteUser_failDelete() {
+        Mockito.when(mockUserRepository.findById(any(String.class))).thenReturn(Optional.empty());
+
+        ResponseCode actualCode = userService.deleteUser(expected.getUuid());
+
+        assertEquals(ResponseCode.ERROR, actualCode);
     }
 }
