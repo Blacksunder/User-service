@@ -1,42 +1,43 @@
 package com.userservice.service;
 
+import com.userservice.dto.UserDto;
 import com.userservice.entity.UserEntity;
 import com.userservice.enums.ResponseCode;
+import com.userservice.mapper.UserMapper;
 import com.userservice.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 @Service
 public class UserServiceImpl implements UserService {
-
-    @Autowired
-    private UserRepository userRepository;
+    
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Override
-    public UserEntity getUserById(String uuid) {
-        return userRepository.findById(uuid).orElse(null);
+    public UserDto getUserById(String uuid) {
+        UserEntity user = userRepository.findById(uuid).orElse(null);
+        return userMapper.userEntityToDto(user);
     }
 
     @Override
-    public List<UserEntity> getAllUsers() {
-        return (List<UserEntity>) userRepository.findAll();
+    public List<String> getAllUsersId() {
+        List<UserEntity> userEntities = (List<UserEntity>) userRepository.findAll();
+        return userEntities.stream()
+                .map(UserEntity::getUuid)
+                .toList();
     }
 
     @Override
-    public ResponseCode saveUser(UserEntity user) {
+    public ResponseCode saveUser(UserDto userDto) {
+        UserEntity userEntity = new UserEntity(userDto.getName(),
+                userDto.getEmail(), userDto.getAge());
         try {
-            userRepository.save(user);
+            userRepository.save(userEntity);
             return ResponseCode.OK;
         } catch (Exception e) {
             return ResponseCode.ERROR;
@@ -45,14 +46,17 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public ResponseCode updateUser(UserEntity user) {
-        UserEntity dbEntity = userRepository.findById(user.getUuid()).orElse(null);
-        if (dbEntity == null) {
+    public ResponseCode updateUser(UserDto userDto, String uuid) {
+        UserEntity foundEntity = userRepository.findById(uuid).orElse(null);
+        if (foundEntity == null) {
             return ResponseCode.ERROR;
         }
         try {
-            user.setCreatedAt(dbEntity.getCreatedAt());
-            userRepository.save(user);
+            UserEntity newEntity = new UserEntity(userDto.getName(),
+                    userDto.getEmail(), userDto.getAge());
+            newEntity.setUuid(uuid);
+            newEntity.setCreatedAt(newEntity.getCreatedAt());
+            userRepository.save(newEntity);
             return ResponseCode.OK;
         } catch (Exception e) {
             return ResponseCode.ERROR;
@@ -62,8 +66,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public ResponseCode deleteUser(String uuid) {
-        UserEntity dbEntity = userRepository.findById(uuid).orElse(null);
-        if (dbEntity == null) {
+        UserEntity userEntity = userRepository.findById(uuid).orElse(null);
+        if (userEntity == null) {
             return ResponseCode.ERROR;
         }
         try {

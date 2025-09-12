@@ -26,10 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(classes = {
-        UserDataController.class,
-        UserMapper.class
-})
+@SpringBootTest(classes = UserDataController.class)
 @AutoConfigureMockMvc
 @EnableAutoConfiguration(exclude = {
         DataSourceAutoConfiguration.class,
@@ -48,7 +45,7 @@ public class UserDataControllerTest {
             new UserDto("2", "2", 2),
             new UserDto("3", "3", 3)
     );
-    String json = new ObjectMapper().writeValueAsString(testDtos.get(0));
+    private final String json = new ObjectMapper().writeValueAsString(testDtos.get(0));
 
     @Autowired
     private MockMvc mockMvc;
@@ -61,7 +58,9 @@ public class UserDataControllerTest {
 
     @Test
     public void getAll_shouldReturnAllUsersIds() throws Exception {
-        Mockito.when(userService.getAllUsers()).thenReturn(testEntities);
+        Mockito.when(userService.getAllUsersId()).thenReturn(testEntities.stream()
+                .map(UserEntity::getUuid)
+                .toList());
 
         mockMvc.perform(get("/user-service/all"))
                 .andExpect(status().isOk())
@@ -71,7 +70,7 @@ public class UserDataControllerTest {
     @Test
     public void getById_shouldReturnUserById() throws Exception {
         Mockito.when(userService.getUserById(testEntities.get(0).getUuid()))
-                .thenReturn(testEntities.get(0));
+                .thenReturn(testDtos.get(0));
         UserDto expected = testDtos.get(0);
 
         mockMvc.perform(get("/user-service/user/{uuid}", testEntities.get(0).getUuid()))
@@ -87,12 +86,12 @@ public class UserDataControllerTest {
                 .thenReturn(null);
 
         mockMvc.perform(get("/user-service/user/{uuid}", testEntities.get(0).getUuid()))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     public void save_shouldSaveUser() throws Exception {
-        Mockito.when(userService.saveUser(testEntities.get(0))).thenReturn(ResponseCode.OK);
+        Mockito.when(userService.saveUser(testDtos.get(0))).thenReturn(ResponseCode.OK);
 
         mockMvc.perform(post("/user-service/save")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -103,7 +102,7 @@ public class UserDataControllerTest {
 
     @Test
     public void save_shouldReturnBadRequest() throws Exception {
-        Mockito.when(userService.saveUser(any(UserEntity.class))).thenReturn(ResponseCode.ERROR);
+        Mockito.when(userService.saveUser(any(UserDto.class))).thenReturn(ResponseCode.ERROR);
 
         mockMvc.perform(post("/user-service/save")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -114,7 +113,8 @@ public class UserDataControllerTest {
 
     @Test
     public void update_shouldUpdateUser() throws Exception {
-        Mockito.when(userService.updateUser(testEntities.get(0))).thenReturn(ResponseCode.OK);
+        Mockito.when(userService.updateUser(testDtos.get(0), testEntities.get(0).getUuid()))
+                .thenReturn(ResponseCode.OK);
 
         mockMvc.perform(patch("/user-service/update/{uuid}", testEntities.get(0).getUuid())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -125,13 +125,14 @@ public class UserDataControllerTest {
 
     @Test
     public void update_shouldReturnNotFound() throws Exception {
-        Mockito.when(userService.updateUser(any(UserEntity.class))).thenReturn(ResponseCode.ERROR);
+        Mockito.when(userService.updateUser(any(UserDto.class), any(String.class)))
+                .thenReturn(ResponseCode.ERROR);
 
         mockMvc.perform(patch("/user-service/update/{uuid}", testEntities.get(0).getUuid())
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -147,6 +148,6 @@ public class UserDataControllerTest {
         Mockito.when(userService.deleteUser(testEntities.get(0).getUuid())).thenReturn(ResponseCode.ERROR);
 
         mockMvc.perform(delete("/user-service/delete/{uuid}", testEntities.get(0).getUuid()))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 }

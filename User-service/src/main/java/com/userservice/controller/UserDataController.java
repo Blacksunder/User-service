@@ -1,34 +1,25 @@
 package com.userservice.controller;
 
 import com.userservice.dto.UserDto;
-import com.userservice.entity.UserEntity;
 import com.userservice.enums.ResponseCode;
-import com.userservice.mapper.UserMapper;
 import com.userservice.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("/user-service")
 public class UserDataController {
+
     private final UserService userService;
-    private final UserMapper userMapper;
-    
-    @Autowired
-    public UserDataController(UserService userService, UserMapper userMapper) {
-        this.userService = userService;
-        this.userMapper = userMapper;
-    }
 
     @GetMapping("/all")
     public ResponseEntity<?> getAll() {
-        List<String> usersIds = userService.getAllUsers().stream()
-                .map(UserEntity::getUuid)
-                .toList();
+        List<String> usersIds = userService.getAllUsersId();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(usersIds);
@@ -36,13 +27,12 @@ public class UserDataController {
 
     @GetMapping("/user/{uuid}")
     public ResponseEntity<?> getById(@PathVariable("uuid") String uuid) {
-        UserEntity userEntity = userService.getUserById(uuid);
-        if (userEntity == null) {
+        UserDto userDto = userService.getUserById(uuid);
+        if (userDto == null) {
             return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
+                    .status(HttpStatus.BAD_REQUEST)
                     .body("User not found");
         }
-        UserDto userDto = userMapper.userEntityToDto(userEntity);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(userDto);
@@ -50,9 +40,7 @@ public class UserDataController {
 
     @PostMapping("/save")
     public ResponseEntity<?> save(@RequestBody UserDto userDto) {
-        UserEntity userEntity = new UserEntity(userDto.getName(),
-                userDto.getEmail(), userDto.getAge());
-        ResponseCode responseCode = userService.saveUser(userEntity);
+        ResponseCode responseCode = userService.saveUser(userDto);
         if (responseCode == ResponseCode.ERROR) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -65,13 +53,10 @@ public class UserDataController {
 
     @PatchMapping("/update/{uuid}")
     public ResponseEntity<?> update(@RequestBody UserDto userDto, @PathVariable("uuid") String uuid) {
-        UserEntity userEntity = new UserEntity(userDto.getName(),
-                userDto.getEmail(), userDto.getAge());
-        userEntity.setUuid(uuid);
-        ResponseCode responseCode = userService.updateUser(userEntity);
+        ResponseCode responseCode = userService.updateUser(userDto, uuid);
         if (responseCode == ResponseCode.ERROR) {
             return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
+                    .status(HttpStatus.BAD_REQUEST)
                     .body("User doesn't exist");
         }
         return ResponseEntity
@@ -84,7 +69,7 @@ public class UserDataController {
         ResponseCode responseCode = userService.deleteUser(uuid);
         if (responseCode == ResponseCode.ERROR) {
             return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
+                    .status(HttpStatus.BAD_REQUEST)
                     .body("User doesn't exists");
         }
         return ResponseEntity

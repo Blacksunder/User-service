@@ -1,5 +1,6 @@
 package com.userservice.service;
 
+import com.userservice.dto.UserDto;
 import com.userservice.entity.UserEntity;
 import com.userservice.enums.ResponseCode;
 
@@ -7,13 +8,13 @@ import java.util.List;
 
 public interface UserService {
 
-    UserEntity getUserById(String uuid);
+    UserDto getUserById(String uuid);
 
-    List<UserEntity> getAllUsers();
+    List<String> getAllUsersId();
 
-    ResponseCode saveUser(UserEntity user);
+    ResponseCode saveUser(UserDto user);
 
-    ResponseCode updateUser(UserEntity user);
+    ResponseCode updateUser(UserDto user, String uuid);
 
     ResponseCode deleteUser(String uuid);
 
