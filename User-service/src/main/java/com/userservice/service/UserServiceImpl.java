@@ -1,9 +1,11 @@
 package com.userservice.service;
 
+import com.userservice.dto.MessageDto;
 import com.userservice.dto.UserDto;
 import com.userservice.entity.UserEntity;
 import com.userservice.enums.ResponseCode;
 import com.userservice.mapper.UserMapper;
+import com.userservice.producer.MessageDtoKafkaSender;
 import com.userservice.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -17,6 +19,7 @@ public class UserServiceImpl implements UserService {
     
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final MessageDtoKafkaSender messageDtoKafkaSender;
 
     @Override
     public UserDto getUserById(String uuid) {
@@ -38,6 +41,8 @@ public class UserServiceImpl implements UserService {
                 userDto.getEmail(), userDto.getAge());
         try {
             userRepository.save(userEntity);
+            MessageDto messageDto = new MessageDto(userEntity.getEmail());
+            messageDtoKafkaSender.sendCreationMessage(messageDto);
             return ResponseCode.OK;
         } catch (Exception e) {
             return ResponseCode.ERROR;
@@ -52,11 +57,9 @@ public class UserServiceImpl implements UserService {
             return ResponseCode.ERROR;
         }
         try {
-            UserEntity newEntity = new UserEntity(userDto.getName(),
-                    userDto.getEmail(), userDto.getAge());
-            newEntity.setUuid(uuid);
-            newEntity.setCreatedAt(newEntity.getCreatedAt());
-            userRepository.save(newEntity);
+            foundEntity.setName(userDto.getName());
+            foundEntity.setEmail(userDto.getEmail());
+            foundEntity.setAge(userDto.getAge());
             return ResponseCode.OK;
         } catch (Exception e) {
             return ResponseCode.ERROR;
@@ -72,6 +75,8 @@ public class UserServiceImpl implements UserService {
         }
         try {
             userRepository.deleteById(uuid);
+            MessageDto messageDto = new MessageDto(userEntity.getEmail());
+            messageDtoKafkaSender.sendDeletionMessage(messageDto);
             return ResponseCode.OK;
         } catch (Exception e) {
             return ResponseCode.ERROR;

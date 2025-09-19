@@ -4,6 +4,7 @@ import com.userservice.dto.UserDto;
 import com.userservice.entity.UserEntity;
 import com.userservice.enums.ResponseCode;
 import com.userservice.mapper.UserMapper;
+import com.userservice.producer.MessageDtoKafkaSender;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import com.userservice.repository.UserRepository;
@@ -17,7 +18,9 @@ import static org.mockito.ArgumentMatchers.any;
 
 public class UserServiceImplTest {
     private final UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
-    private final UserService userService = new UserServiceImpl(mockUserRepository, new UserMapper());
+    private final MessageDtoKafkaSender mockMessageDtoKafkaSender = Mockito.mock(MessageDtoKafkaSender.class);
+    private final UserService userService = new UserServiceImpl(mockUserRepository,
+            new UserMapper(), mockMessageDtoKafkaSender);
     private final LocalDateTime time = LocalDateTime.now();
     private final String uuid = "111";
     private final UserDto expectedDto = new UserDto("aaa", "bbb", 10);

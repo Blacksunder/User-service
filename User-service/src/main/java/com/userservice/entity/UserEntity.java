@@ -34,4 +34,5 @@ public class UserEntity {
         this.age = age;
         createdAt = LocalDateTime.now();
     }
+
 }
