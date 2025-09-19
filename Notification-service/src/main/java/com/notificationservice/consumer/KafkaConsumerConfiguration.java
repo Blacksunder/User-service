@@ -1,4 +1,4 @@
-package com.notificationservice.configuration;
+package com.notificationservice.consumer;
 
 import com.notificationservice.dto.MessageDto;
 import org.springframework.beans.factory.annotation.Value;
