@@ -21,7 +21,7 @@ public class KafkaProducerConfiguration {
     private String bootstrapServers;
 
     @Bean
-    public ProducerFactory<String, MessageDto> testProducerFactory() {
+    public ProducerFactory<String, MessageDto> producerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -32,7 +32,7 @@ public class KafkaProducerConfiguration {
 
     @Bean
     public KafkaTemplate<String, MessageDto> kafkaTemplate() {
-        return new KafkaTemplate<>(testProducerFactory());
+        return new KafkaTemplate<>(producerFactory());
     }
 
 }

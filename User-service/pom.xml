@@ -42,7 +42,7 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Lombok (правильная зависимость) -->
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -94,7 +94,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.example.UserServiceApplication</mainClass>
+                    <mainClass>com.userservice.Main</mainClass>
                 </configuration>
             </plugin>
         </plugins>

@@ -4,17 +4,12 @@ import com.userservice.dto.MessageDto;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.*;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.kafka.test.context.EmbeddedKafka;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.junit.jupiter.Container;
@@ -29,35 +24,13 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-//@SpringBootTest
-//@EmbeddedKafka
-//@ContextConfiguration(classes = TestKafkaConfig.class)
-//public class MessageDtoKafkaSenderTest {
-//
-//    @Autowired
-//    private MessageDtoKafkaSender messageDtoKafkaSender;
-//
-//    private final MessageDto messageDto = new MessageDto("test@mail.ru");
-//
-//    @Test
-//    public void sendCreationMessage_successfulSending() {
-//        assertDoesNotThrow(() -> messageDtoKafkaSender.sendCreationMessage(messageDto));
-//    }
-//
-//    @Test
-//    public void sendDeletionMessage_successfulSending() {
-//        assertDoesNotThrow(() -> messageDtoKafkaSender.sendDeletionMessage(messageDto));
-//    }
-//}
-
-@SpringBootTest
+@SpringBootTest(classes = {TestKafkaConfig.class, MessageDtoKafkaSender.class})
 @Testcontainers
 public class MessageDtoKafkaSenderTest {
 
     @Container
-    private static final KafkaContainer KAFKA = new KafkaContainer(
-            DockerImageName.parse("confluentinc/cp-kafka:7.4.0")
-                    .asCompatibleSubstituteFor("apache/kafka")
+    static final KafkaContainer KAFKA = new KafkaContainer(
+            DockerImageName.parse("apache/kafka:3.7.0")
     );
 
     @DynamicPropertySource
@@ -74,6 +47,7 @@ public class MessageDtoKafkaSenderTest {
     @Test
     public void sendCreationMessage_successfulSending() {
         assertDoesNotThrow(() -> messageDtoKafkaSender.sendCreationMessage(messageDto));
+        System.out.println("Message is sent");
         checkForMessageSending();
     }
 
@@ -107,4 +81,5 @@ public class MessageDtoKafkaSenderTest {
             assertEquals(messageDto, message);
         }
     }
+
 }

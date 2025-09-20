@@ -20,7 +20,7 @@ public class MessageDtoKafkaSender {
         try {
             kafkaTemplate.send(USER_CREATION_TOPIC, messageDto);
         } catch (Exception e) {
-            log.error(e.getMessage() + " with message " + messageDto);
+            logException(e, messageDto);
         }
     }
 
@@ -28,8 +28,12 @@ public class MessageDtoKafkaSender {
         try {
             kafkaTemplate.send(USER_DELETION_TOPIC, messageDto);
         } catch (Exception e) {
-            log.error(e.getMessage() + " with message " + messageDto);
+            logException(e, messageDto);
         }
 
+    }
+
+    private void logException(Exception e, MessageDto messageDto) {
+        log.error(e.getMessage() + " with message " + messageDto);
     }
 }
