@@ -1,24 +1,32 @@
 package com.userservice.producer;
 
 import com.userservice.dto.MessageDto;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 @Component
-@AllArgsConstructor
 @Slf4j
 public class MessageDtoKafkaSender {
 
     private final KafkaTemplate<String, MessageDto> kafkaTemplate;
 
-    private static final String USER_CREATION_TOPIC = "user_creation";
-    private static final String USER_DELETION_TOPIC = "user_deletion";
+    @Value("${creation_topic}")
+    private String userCreationTopic;
+
+    @Value("${deletion_topic}")
+    private String userDeletionTopic;
+
+    public MessageDtoKafkaSender(KafkaTemplate<String, MessageDto> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     public void sendCreationMessage(MessageDto messageDto) {
         try {
-            kafkaTemplate.send(USER_CREATION_TOPIC, messageDto);
+            kafkaTemplate.send(userCreationTopic, messageDto);
         } catch (Exception e) {
             logException(e, messageDto);
         }
@@ -26,7 +34,7 @@ public class MessageDtoKafkaSender {
 
     public void sendDeletionMessage(MessageDto messageDto) {
         try {
-            kafkaTemplate.send(USER_DELETION_TOPIC, messageDto);
+            kafkaTemplate.send(userDeletionTopic, messageDto);
         } catch (Exception e) {
             logException(e, messageDto);
         }
@@ -35,5 +43,7 @@ public class MessageDtoKafkaSender {
 
     private void logException(Exception e, MessageDto messageDto) {
         log.error(e.getMessage() + " with message " + messageDto);
+        log.error(Arrays.toString(e.getStackTrace()));
     }
+
 }

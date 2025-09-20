@@ -81,7 +81,7 @@ public class UserDataControllerTest {
     }
 
     @Test
-    public void getById_shouldReturnNotFound() throws Exception {
+    public void getById_shouldReturnBadRequest() throws Exception {
         Mockito.when(userService.getUserById(testEntities.get(0).getUuid()))
                 .thenReturn(null);
 
@@ -124,7 +124,7 @@ public class UserDataControllerTest {
     }
 
     @Test
-    public void update_shouldReturnNotFound() throws Exception {
+    public void update_shouldReturnBadRequest() throws Exception {
         Mockito.when(userService.updateUser(any(UserDto.class), any(String.class)))
                 .thenReturn(ResponseCode.ERROR);
 
@@ -144,7 +144,7 @@ public class UserDataControllerTest {
     }
 
     @Test
-    public void delete_shouldReturnNotFound() throws Exception {
+    public void delete_shouldReturnBadRequest() throws Exception {
         Mockito.when(userService.deleteUser(testEntities.get(0).getUuid())).thenReturn(ResponseCode.ERROR);
 
         mockMvc.perform(delete("/user-service/delete/{uuid}", testEntities.get(0).getUuid()))

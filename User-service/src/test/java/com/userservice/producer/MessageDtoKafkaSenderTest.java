@@ -24,7 +24,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(classes = {TestKafkaConfig.class, MessageDtoKafkaSender.class})
+@SpringBootTest(classes = {KafkaProducerConfiguration.class, MessageDtoKafkaSender.class})
 @Testcontainers
 public class MessageDtoKafkaSenderTest {
 

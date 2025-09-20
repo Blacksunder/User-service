@@ -14,7 +14,7 @@ public class NotificationKafkaListener {
 
     private final NotificationService notificationService;
 
-    @org.springframework.kafka.annotation.KafkaListener(topics = {"user_creation", "user_deletion"},
+    @org.springframework.kafka.annotation.KafkaListener(topics = "#{'${listenable-topics}'.split(',')}",
     containerFactory = "messageDtoKafkaListenerContainerFactory")
     public void listenMessageDto(MessageDto messageDto,
                                  @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
