@@ -27,7 +27,9 @@ public class KafkaProducerConfiguration {
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         props.put(ProducerConfig.ACKS_CONFIG, "all");
-        return new DefaultKafkaProducerFactory<>(props);
+        DefaultKafkaProducerFactory<String, MessageDto> factory = new DefaultKafkaProducerFactory<>(props);
+        factory.setValueSerializer(new org.springframework.kafka.support.serializer.JsonSerializer<MessageDto>());
+        return factory;
     }
 
     @Bean
