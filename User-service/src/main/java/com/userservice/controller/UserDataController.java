@@ -1,13 +1,16 @@
 package com.userservice.controller;
 
 import com.userservice.dto.UserDto;
+import com.userservice.dto.UserIdDto;
 import com.userservice.enums.ResponseCode;
+import com.userservice.hateaos.HateaosBuilder;
 import com.userservice.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +23,16 @@ import java.util.List;
 public class UserDataController {
 
     private final UserService userService;
+    private final HateaosBuilder hateaosBuilder;
 
     @Operation(summary = "Get all users' IDs")
     @GetMapping("/all")
     public ResponseEntity<?> getAll() {
         List<String> usersIds = userService.getAllUsersId();
+        CollectionModel<EntityModel<UserIdDto>> entityModels = hateaosBuilder.userIdDtoCollectionModel(usersIds);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(usersIds);
+                .body(entityModels);
     }
 
     @Operation(summary = "Get user by ID")
@@ -43,9 +48,10 @@ public class UserDataController {
                     .status(HttpStatus.BAD_REQUEST)
                     .body("User not found");
         }
+        EntityModel<UserDto> entityModel = hateaosBuilder.userDtoEntityModel(uuid, userDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(userDto);
+                .body(entityModel);
     }
 
     @Operation(summary = "Saving one user")

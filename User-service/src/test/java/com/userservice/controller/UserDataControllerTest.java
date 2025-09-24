@@ -3,7 +3,7 @@ package com.userservice.controller;
 import com.userservice.dto.UserDto;
 import com.userservice.entity.UserEntity;
 import com.userservice.enums.ResponseCode;
-import com.userservice.mapper.UserMapper;
+import com.userservice.hateaos.HateaosBuilder;
 import com.userservice.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -26,7 +26,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(classes = UserDataController.class)
+@SpringBootTest(classes = {
+        UserDataController.class,
+        HateaosBuilder.class
+})
 @AutoConfigureMockMvc
 @EnableAutoConfiguration(exclude = {
         DataSourceAutoConfiguration.class,
@@ -64,7 +67,7 @@ public class UserDataControllerTest {
 
         mockMvc.perform(get("/user-service/all"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(3));
+                .andExpect(jsonPath("$._embedded.*.length()").value(3));
     }
 
     @Test
@@ -77,7 +80,9 @@ public class UserDataControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(expected.getName()))
                 .andExpect(jsonPath("$.email").value(expected.getEmail()))
-                .andExpect(jsonPath("$.age").value(expected.getAge()));
+                .andExpect(jsonPath("$.age").value(expected.getAge()))
+                .andExpect(jsonPath("$._links.self.href").exists())
+                .andExpect(jsonPath("._links.users.href").exists());
     }
 
     @Test
