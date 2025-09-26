@@ -6,6 +6,7 @@ import com.userservice.enums.ResponseCode;
 import com.userservice.hateaos.HateaosBuilder;
 import com.userservice.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
@@ -41,7 +42,8 @@ public class UserDataController {
             @ApiResponse(responseCode = "400", description = "User wasn't found")
     })
     @GetMapping("/user/{uuid}")
-    public ResponseEntity<?> getById(@PathVariable("uuid") String uuid) {
+    public ResponseEntity<?> getById(@Parameter(description = "User's uuid", required = true)
+                                         @PathVariable("uuid") String uuid) {
         UserDto userDto = userService.getUserById(uuid);
         if (userDto == null) {
             return ResponseEntity
@@ -79,6 +81,7 @@ public class UserDataController {
     })
     @PatchMapping("/update/{uuid}")
     public ResponseEntity<?> update(@RequestBody UserDto userDto,
+                                    @Parameter(description = "User's uuid", required = true)
                                     @PathVariable("uuid") String uuid) {
         ResponseCode responseCode = userService.updateUser(userDto, uuid);
         if (responseCode == ResponseCode.ERROR) {
@@ -97,7 +100,8 @@ public class UserDataController {
             @ApiResponse(responseCode = "400", description = "User wasn't found")
     })
     @DeleteMapping("/delete/{uuid}")
-    public ResponseEntity<?> delete(@PathVariable("uuid") String uuid) {
+    public ResponseEntity<?> delete(@Parameter(description = "User's uuid", required = true)
+                                        @PathVariable("uuid") String uuid) {
         ResponseCode responseCode = userService.deleteUser(uuid);
         if (responseCode == ResponseCode.ERROR) {
             return ResponseEntity

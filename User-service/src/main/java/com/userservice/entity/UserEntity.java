@@ -28,8 +28,7 @@ public class UserEntity {
     @NotNull
     private String email;
 
-    @Size(max = 100)
-    private int age;
+    private Integer age;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
