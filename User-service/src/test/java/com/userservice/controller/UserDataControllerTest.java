@@ -3,7 +3,7 @@ package com.userservice.controller;
 import com.userservice.dto.UserDto;
 import com.userservice.entity.UserEntity;
 import com.userservice.enums.ResponseCode;
-import com.userservice.mapper.UserMapper;
+import com.userservice.hateaos.HateaosBuilder;
 import com.userservice.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -26,7 +26,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(classes = UserDataController.class)
+@SpringBootTest(classes = {
+        UserDataController.class,
+        HateaosBuilder.class
+})
 @AutoConfigureMockMvc
 @EnableAutoConfiguration(exclude = {
         DataSourceAutoConfiguration.class,
@@ -64,7 +67,7 @@ public class UserDataControllerTest {
 
         mockMvc.perform(get("/user-service/all"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(3));
+                .andExpect(jsonPath("$._embedded.*.length()").value(3));
     }
 
     @Test
@@ -77,11 +80,13 @@ public class UserDataControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(expected.getName()))
                 .andExpect(jsonPath("$.email").value(expected.getEmail()))
-                .andExpect(jsonPath("$.age").value(expected.getAge()));
+                .andExpect(jsonPath("$.age").value(expected.getAge()))
+                .andExpect(jsonPath("$._links.self.href").exists())
+                .andExpect(jsonPath("._links.users.href").exists());
     }
 
     @Test
-    public void getById_shouldReturnNotFound() throws Exception {
+    public void getById_shouldReturnBadRequest() throws Exception {
         Mockito.when(userService.getUserById(testEntities.get(0).getUuid()))
                 .thenReturn(null);
 
@@ -124,7 +129,7 @@ public class UserDataControllerTest {
     }
 
     @Test
-    public void update_shouldReturnNotFound() throws Exception {
+    public void update_shouldReturnBadRequest() throws Exception {
         Mockito.when(userService.updateUser(any(UserDto.class), any(String.class)))
                 .thenReturn(ResponseCode.ERROR);
 
@@ -144,7 +149,7 @@ public class UserDataControllerTest {
     }
 
     @Test
-    public void delete_shouldReturnNotFound() throws Exception {
+    public void delete_shouldReturnBadRequest() throws Exception {
         Mockito.when(userService.deleteUser(testEntities.get(0).getUuid())).thenReturn(ResponseCode.ERROR);
 
         mockMvc.perform(delete("/user-service/delete/{uuid}", testEntities.get(0).getUuid()))

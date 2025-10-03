@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -20,9 +22,13 @@ public class UserEntity {
     @Id
     private String uuid;
 
+    @NotNull
     private String name;
+
+    @NotNull
     private String email;
-    private int age;
+
+    private Integer age;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -34,4 +40,5 @@ public class UserEntity {
         this.age = age;
         createdAt = LocalDateTime.now();
     }
+
 }
