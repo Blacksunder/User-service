@@ -14,7 +14,7 @@
     <description>Multi-module project for user management</description>
 
     <modules>
-        <module>user-service</module>
+        <module>user-handler-service</module>
         <module>notification-service</module>
         <module>eureka-server</module>
         <module>api-gateway</module>

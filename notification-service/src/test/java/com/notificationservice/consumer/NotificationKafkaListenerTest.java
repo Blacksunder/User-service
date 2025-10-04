@@ -23,7 +23,7 @@ import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {KafkaConsumerConfiguration.class, NotificationKafkaListener.class})
+@SpringBootTest
 @Testcontainers
 public class NotificationKafkaListenerTest {
 

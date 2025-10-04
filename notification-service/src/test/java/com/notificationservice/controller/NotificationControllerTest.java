@@ -15,7 +15,13 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = NotificationController.class)
+@WebMvcTest(
+        controllers = NotificationController.class,
+        excludeAutoConfiguration = {
+                org.springframework.cloud.autoconfigure.ConfigurationPropertiesRebinderAutoConfiguration.class,
+                org.springframework.cloud.autoconfigure.RefreshAutoConfiguration.class
+        }
+)
 public class NotificationControllerTest {
 
     private final String messageJson = """
