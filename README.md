@@ -3,4 +3,5 @@ REST API with basic CRUD operations using Spring. It provides the server with ur
 
 Before the launch you should run docker-compose.yaml and configure application.properties for Notification-service (mail connection settings).
 
-If docker images are running and mail settings are correct, you can launch User and Notification services by running Main for each other.
+If docker images are running and mail settings are correct, you can launch services by running Main for each other.
+
