@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      mode: always
+  data:
+    jpa:
+      repositories:
+        enabled: true
+  kafka:
+    acks-config: all
+
+creation_topic: user_creation
+deletion_topic: user_deletion
+
+logging:
+  level:
+    sql: trace
+    web: debug
+  file:
+    name: user-handler-service/logs/log.log
+  logback:
+    rollingpolicy:
+      clean-history-on-start: true
