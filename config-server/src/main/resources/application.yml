@@ -1,0 +1,9 @@
+spring:
+  profiles:
+    active: local, native
+
+  application:
+    name: config-server
+
+server:
+  port: 8888

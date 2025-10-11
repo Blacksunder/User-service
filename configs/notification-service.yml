@@ -1,0 +1,13 @@
+spring:
+  mail:
+    host: smtp.mail.ru
+    port: 465
+    username: your_email
+    password: your_password
+    protocol: smtps
+  kafka:
+    consumer:
+        group-id: test-group
+        auto-offset-reset: earliest
+
+listenable-topics: user_creation,user_deletion
