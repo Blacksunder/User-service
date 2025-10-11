@@ -1,0 +1,9 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8080/eureka
+  instance:
+    hostname: api-gateway
+    prefer-ip-address: false
+    health-check-url: http://api-gateway:8081/
+    status-page-url: http://api-gateway:8081/
